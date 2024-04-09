@@ -64,7 +64,13 @@ for emls in emailBody[::-1]:
                 #print(part.get_content_type())
                 if part.get_content_type() == 'text/plain':
                     print (part.get_payload())
+            #ADDING KEYS AND VALUES TO THE DICTIONARY "data" TO THEN PRINT IT TO EXCEL
+            dic = {}
 
+            dic["sender"] = 
+            dic["email"] = my_eml['from']
+            dic["subject"] = my_eml['subject']
+            dic["body"] = "gakjhsfl;ahgdkjflas;augdhfkaj"
 
 
 
