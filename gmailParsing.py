@@ -9,6 +9,8 @@ import email
 import imaplib
 #getting username and password to be able to use said email
 import yaml
+#pasting gmail info into excel
+import xlsxwriter
 
 #opens the yaml file with username and password and uses them to log in to email
 with open("usernameAndPassword.yml") as f:
@@ -62,3 +64,34 @@ for emls in emailBody[::-1]:
                 #print(part.get_content_type())
                 if part.get_content_type() == 'text/plain':
                     print (part.get_payload())
+
+
+
+
+
+'''PASTING INFO INTO EXCEL'''
+
+data = {
+        
+        }
+
+def infoPaster(data):
+    
+    workbook = xlsxwriter.Workbook("GmailsInfo.x1sx")
+    worksheet = workbook.add_worksheet("firstSheet")
+    
+    worksheet.write(0, 0, "#") 
+    worksheet.write(0, 1, "Sender") 
+    worksheet.write(0, 2, "Email") 
+    worksheet.write(0, 3, "Subject") 
+    worksheet.write(0, 4, "Body") 
+    
+    
+    for index, entry in enumerate(data):
+        worksheet.write(index+1, 0, str(index))
+        worksheet.write(index+1, 1, entry["Sender"])
+        worksheet.write(index+1, 2, entry["Email"]) 
+        worksheet.write(index+1, 3, entry["Subject"]) 
+        worksheet.write(index+1, 4, entry["Body"]) 
+
+    workbook.close()
