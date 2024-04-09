@@ -29,7 +29,7 @@ imapGmail.select('Inbox')
 #enter the email or contrants of the type of information you need 
 #to get from the emails
 key = "FROM"
-gmail = "gzaudi738@gmail.com"
+gmail = "exampleEmail@gmail.com"
 
 #gets the data from the inbox
 _, data = imapGmail.search(None, key, gmail)
