@@ -19,5 +19,6 @@ from openpyxl import Workbook, load_workbook
 def Paster(data):
     wb = load_workbook('List of Emails to be used.xlsx')
     ws = wb.active
-    ws.append(data)
+    ws.append(list(data.values()))
     wb.save('List of Emails to be used.xlsx')
+
