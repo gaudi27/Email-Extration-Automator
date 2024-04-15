@@ -6,8 +6,8 @@ emails to automate getting information from emails.'''
 
 
 #TODO - create UI
-#TODO - Figure out how to save changes when adding emails to a txt file
-
+#TODO - be able to recognize if an email needs--
+#to be pasted not by the sender but by patterns within the email body 
 
 
 #libraries
@@ -17,12 +17,12 @@ import imaplib
 import yaml
 #pasting gmail info into excel
 import excelPaster
+#storing emails in txt file
+import StoreEmail
 #a list made to extract the whole emails
 emailBody = []
 #stores the emails so it doesnt add an email to spreadsheet more than once
 INFO = []
-#boolean for finding repeats in emails
-repeat = False
 
 #opens the yaml file with username and password and uses them to log in to email
 with open("usernameAndPassword.yml") as f:
@@ -90,17 +90,5 @@ while True:
                     if part.get_content_type() == 'text/plain':
                         print(part.get_payload())
                         dic["body"] = part.get_payload()
-                #open a file to put the emails in so we dont get repeats
-                with open('emailsInfoList', 'a+') as file:
-                    fp = file.readlines()
-                    print(file.readlines())
-                    for row in fp:
-                        print("here")
-                        print(row.find(dic["body"]))
-                        if row.find(dic["body"]) != -1:
-                            repeat = True
-                    if repeat == False:
-                        excelPaster.Paster(dic)
-                        file.write(dic["body"])
-                    file.close()
-
+                if StoreEmail.EmailStorage(dic) == False:
+                    excelPaster.Paster(dic)
