@@ -4,6 +4,12 @@ Date: April 4th 2024'''
 emails to automate getting information from emails.'''
 
 
+
+#TODO - create UI
+#TODO - Figure out how to save changes when adding emails to a txt file
+
+
+
 #libraries
 import email
 import imaplib
@@ -11,14 +17,12 @@ import imaplib
 import yaml
 #pasting gmail info into excel
 import excelPaster
-#setting a count for the amount of emails to make it so this will 
-#auto update the spreadsheet when an email comes in
-count = 0
-x = 0
 #a list made to extract the whole emails
 emailBody = []
+#stores the emails so it doesnt add an email to spreadsheet more than once
 INFO = []
-
+#boolean for finding repeats in emails
+repeat = False
 
 #opens the yaml file with username and password and uses them to log in to email
 with open("usernameAndPassword.yml") as f:
@@ -57,12 +61,10 @@ while True:
     
     
     #going through the list of emails and putting them into the emailBody list
-    
-    
-    
     for i in getIDs:
         typ, data = imapGmail.fetch(i, '(RFC822)')
         emailBody.append(data)
+    
     
     
     '''I now have all the messages but with alot of unneeded data
@@ -88,7 +90,17 @@ while True:
                     if part.get_content_type() == 'text/plain':
                         print(part.get_payload())
                         dic["body"] = part.get_payload()
-                if dic not in INFO:
-                    INFO.append(dic)
-                    excelPaster.Paster(dic)
-    
+                #open a file to put the emails in so we dont get repeats
+                with open('emailsInfoList', 'a+') as file:
+                    fp = file.readlines()
+                    print(file.readlines())
+                    for row in fp:
+                        print("here")
+                        print(row.find(dic["body"]))
+                        if row.find(dic["body"]) != -1:
+                            repeat = True
+                    if repeat == False:
+                        excelPaster.Paster(dic)
+                        file.write(dic["body"])
+                    file.close()
+
