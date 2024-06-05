@@ -13,6 +13,14 @@ and stops repeats from printing in the excel sheet"""
 import openpyxl
 import os
 
+def resource_path(relative_path):
+    """ Get the absolute path to the resource, works for dev and for PyInstaller """
+    try:
+        base_path = os.path.join(os.path.dirname(__file__))
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 
 #checks to see if file exists, if not it creates a new file for the emails to be pasted into
 def excel_file_exists(file_path):
@@ -26,14 +34,13 @@ def excel_file_exists(file_path):
     else:
         return False
 
-
 #checks for if a new file needs creation
 def needNewFile():
     file_path = "List of Emails to be used.xlsx"
     if excel_file_exists(file_path) == False:
         wb = openpyxl.Workbook()
         ws = wb.active
-        x = ["Sender", " ","Subject", "Body"]
+        x = ["Sender","Subject", "Body"]
         ws.append(x)
         ws.title = "List of Emails to be used"
         wb.save(filename=file_path)
@@ -52,3 +59,4 @@ def EmailStorage(dic):
         return True
     return False
 
+    
