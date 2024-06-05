@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import messagebox
 import yaml
 import os
+import sys
 import subprocess
 from gmailParsing import start_parsing_emails
 
@@ -41,9 +42,10 @@ class EmailParserApp:
         self.open_button = tk.Button(root, text="Open Spreadsheet", command=self.open_spreadsheet)
         self.open_button.pack(pady=5)
 
-
         self.parsing = False
         self.thread = None
+
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def save_credentials(self):
         user = self.user_entry.get()
@@ -55,9 +57,8 @@ class EmailParserApp:
 
     def start_parsing(self):
         if not self.parsing:
-            self.parser = start_parsing_emails()
             self.parsing = True
-            self.thread = threading.Thread(target=self.parser.start_parsing_emails)
+            self.thread = threading.Thread(target=start_parsing_emails)
             self.thread.daemon = True  # Allow thread to exit when main program exits
             self.thread.start()
             messagebox.showinfo("Email Parser", "Started parsing emails.")
@@ -74,8 +75,14 @@ class EmailParserApp:
         else:
             messagebox.showwarning("Email Parser", "Spreadsheet file not found.")
 
+    def on_closing(self):
+        self.parsing = False
+        if self.thread and self.thread.is_alive():
+            self.thread.join(1)
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = EmailParserApp(root)
     root.mainloop()
+
