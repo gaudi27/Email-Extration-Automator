@@ -9,6 +9,7 @@ emails to automate getting information from emails.'''
 #TODO - change the email recognition to subject instead of sender
 
 #libraries
+import os
 import email
 import imaplib
 #getting username and password to be able to use said email
@@ -18,15 +19,28 @@ import excelPaster
 #storing emails in txt file
 import StoreEmail
 
+def resource_path(relative_path):
+    """ Get the absolute path to the resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = os.path.join(os.path.dirname(__file__))
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 def start_parsing_emails():
     #a list made to extract the whole emails
     emailBody = []
     #stores the emails so it doesnt add an email to spreadsheet more than once
     INFO = []
-    
+    processed_email_ids = set()
+
     #opens the yaml file with username and password and uses them to log in to email
-    with open("usernameAndPassword.yml") as f:
+    config_path = resource_path("usernameAndPassword.yml")
+    with open(config_path) as f:
         text = f.read()
+    
         
     #setting username and password to variables
     info = yaml.load(text, Loader=yaml.FullLoader)
@@ -62,8 +76,10 @@ def start_parsing_emails():
         
         #going through the list of emails and putting them into the emailBody list
         for i in getIDs:
-            typ, data = imapGmail.fetch(i, '(RFC822)')
-            emailBody.append(data)
+            if i not in processed_email_ids:
+                typ, data = imapGmail.fetch(i, '(RFC822)')
+                emailBody.append(data)
+                processed_email_ids.add(i)  # Add email ID to processed set
         
         
         
@@ -75,10 +91,6 @@ def start_parsing_emails():
             for response in emls:
                 if type(response) is tuple:
                     my_eml = email.message_from_bytes((response[1]))
-                    print("_________________________________________")
-                    print ("subj:", my_eml['subject'])
-                    print ("from:", my_eml['from'])
-                    print ("body:")
                     #ADDING KEYS AND VALUES TO THE DICTIONARY "data" TO THEN PRINT IT TO EXCEL
                     dic = {}
                     dic["sender"] = my_eml['from']
@@ -88,7 +100,6 @@ def start_parsing_emails():
                     for part in my_eml.walk():  
                         #print(part.get_content_type())
                         if part.get_content_type() == 'text/plain':
-                            print(part.get_payload())
                             dic["body"] = part.get_payload()
                     StoreEmail.needNewFile()
                     if StoreEmail.EmailStorage(dic) == False:
