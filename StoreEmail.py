@@ -9,7 +9,8 @@ Created on Mon Apr 15 18:07:25 2024
 """this is a program to save emails to a txt file so that the emails are saved
 and stops repeats from printing in the excel sheet"""
 
-#use openpyxl to read the emails for repeats
+#use openpyxl to read the emails for repeats'
+import gmailParsing
 import openpyxl
 import os
 
@@ -35,6 +36,7 @@ def excel_file_exists(file_path):
         return False
 
 #checks for if a new file needs creation
+#BUG FIX FOR WHEN THERES NO FILE
 def needNewFile():
     file_path = "List of Emails to be used.xlsx"
     if excel_file_exists(file_path) == False:
@@ -51,7 +53,7 @@ def EmailStorage(dic):
     sheetData = sheet.active
     maxRow = sheetData.max_row
     bodyList = []
-    for i in range(1, maxRow):
+    for i in range(1, maxRow+1):
         bodyCells = sheetData.cell(row = i, column = 4)
         bodyList.append(bodyCells.value)
     #checks to see if email is already in the sheet so theres no repeats
